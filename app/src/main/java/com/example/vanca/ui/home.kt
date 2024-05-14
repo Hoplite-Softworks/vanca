@@ -51,34 +51,62 @@ private val TAG: String = "Home"
 @Composable
 fun Home(modifier: Modifier = Modifier) {
 
-    Column (
+    LazyColumn (
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Image(
+        item { Image(
             painter = painterResource(id = R.drawable.together),
             contentDescription = null,
             contentScale = ContentScale.FillWidth,
             modifier = Modifier.fillMaxWidth()
-        )
+        ) }
 
-        OutlinedTextField(
-            value = "",
-            onValueChange = {},
-            label = {Text(text = "Look up a station")},
-            modifier = Modifier.padding(top = 16.dp)
-        )
+        item {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = {Text(text = "Look up a station")},
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
 
-        StationList(stationList = Datasource().loadStations())
 
-        NewsList(newsList = Datasource().loadNews())
+        item {
+            Text(
+                text = "Recent & Favorites",
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .padding(top=8.dp)
+            )
+        }
+
+        items(Datasource().loadStations()) { station ->
+            StationCard(
+                station = station,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .height(60.dp)
+            )
+        }
+
+        /*item {
+            NewsList(newsList = Datasource().loadNews())
+        }*/
+
     }
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StationList(stationList: List<Station>, modifier: Modifier = Modifier) {
+
+    Text(
+        text = "Recent & Favorites",
+        fontSize = 20.sp,
+        modifier = Modifier
+            .padding(top=8.dp)
+    )
 
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,15 +115,6 @@ fun StationList(stationList: List<Station>, modifier: Modifier = Modifier) {
             .border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
             .verticalScroll(rememberScrollState())
     ) {
-
-        stickyHeader {
-            Text(
-                text = "Recent & Favorites",
-                fontSize = 20.sp,
-                modifier = Modifier
-                    .padding(top=8.dp)
-            )
-        }
 
         items(stationList) { station ->
             StationCard(
