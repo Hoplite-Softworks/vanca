@@ -51,28 +51,46 @@ private val TAG: String = "Home"
 @Composable
 fun Home(modifier: Modifier = Modifier) {
 
-    LazyColumn (
+    Column (
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
+        verticalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier.verticalScroll(rememberScrollState())
     ) {
-        item { Image(
+        Image(
             painter = painterResource(id = R.drawable.together),
             contentDescription = null,
             contentScale = ContentScale.FillWidth,
             modifier = Modifier.fillMaxWidth()
-        ) }
+        )
 
-        item {
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                label = {Text(text = "Look up a station")},
-                modifier = Modifier.padding(top = 16.dp)
-            )
-        }
+        OutlinedTextField(
+            value = "",
+            onValueChange = {},
+            label = {Text(text = "Look up a station")},
+            modifier = Modifier.padding(top = 16.dp)
+        )
 
+        StationList(stationList = Datasource().loadStations())
 
-        item {
+        NewsList(newsList = Datasource().loadNews())
+    }
+
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun StationList(stationList: List<Station>, modifier: Modifier = Modifier) {
+    val numberOfStations: Int = stationList.size
+    val lazyColumnHeight: Int = (numberOfStations+1) * (60+8)
+    LazyColumn(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(32.dp, 32.dp)
+            .border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
+            .height(lazyColumnHeight.dp)
+    ) {
+
+        stickyHeader {
             Text(
                 text = "Recent & Favorites",
                 fontSize = 20.sp,
@@ -81,76 +99,48 @@ fun Home(modifier: Modifier = Modifier) {
             )
         }
 
-        items(Datasource().loadStations()) { station ->
-            StationCard(
-                station = station,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .height(60.dp)
-            )
-        }
-
-        /*item {
-            NewsList(newsList = Datasource().loadNews())
-        }*/
-
-    }
-
-}
-
-@Composable
-fun StationList(stationList: List<Station>, modifier: Modifier = Modifier) {
-
-    Text(
-        text = "Recent & Favorites",
-        fontSize = 20.sp,
-        modifier = Modifier
-            .padding(top=8.dp)
-    )
-
-    LazyColumn(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(32.dp, 32.dp)
-            .border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
-            .verticalScroll(rememberScrollState())
-    ) {
-
         items(stationList) { station ->
             StationCard(
                 station = station,
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(16.dp, 8.dp)
                     .height(60.dp)
             )
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NewsList(newsList: List<News>, modifier: Modifier = Modifier) {
 
-    Column(
+    val numberOfNews: Int = newsList.size
+    val lazyColumnHeight: Int = (newsList.size) * (96+8+8) + 25 + 8 + 8
+
+    LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(32.dp, 0.dp)
             .border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
+            .height(lazyColumnHeight.dp)
     ) {
-        Text(
-            text = "News & Announcements",
-            fontSize = 20.sp,
-            modifier = Modifier
-                .padding(top=8.dp)
-        )
-        LazyColumn(modifier = Modifier.padding(8.dp)) {
-            items(newsList) { news ->
-                NewsCard(
-                    news = news,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .height(96.dp)
-                )
-            }
+        stickyHeader {
+            Text(
+                text = "News & Announcements",
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .height(25.dp)
+            )
+        }
+
+        items(newsList) { news ->
+            NewsCard(
+                news = news,
+                modifier = Modifier
+                    .padding(16.dp,8.dp)
+                    .height(96.dp)
+            )
         }
     }
 
@@ -240,7 +230,7 @@ private fun StationCardPreview() {
     )
 }
 
-@Preview
+//@Preview
 @Composable
 private fun NewsCardPreview() {
     NewsCard(
