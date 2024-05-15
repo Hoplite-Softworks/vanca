@@ -2,6 +2,7 @@ package com.example.vanca.ui
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,9 +36,9 @@ import java.io.Console
 private val TAG: String = "Station"
 
 @Composable
-fun Station(modifier: Modifier = Modifier) {
+fun Station(modifier: Modifier = Modifier, scrollState: ScrollState = rememberScrollState()) {
     Column (
-        modifier = modifier.verticalScroll(rememberScrollState()),
+        modifier = modifier.verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(

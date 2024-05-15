@@ -1,12 +1,10 @@
 package com.example.vanca.ui
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,8 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -26,6 +23,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarData
+import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,9 +33,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,13 +51,16 @@ import com.example.vanca.ui.theme.VancaTheme
 
 private val TAG: String = "Home"
 @Composable
-fun Home(modifier: Modifier = Modifier) {
-
+fun Home(modifier: Modifier = Modifier, scrollState: ScrollState = rememberScrollState()) {
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier.verticalScroll(rememberScrollState())
+        verticalArrangement = Arrangement.Top,
+        modifier = modifier.verticalScroll(scrollState)
     ) {
+        Spacer(modifier = Modifier
+            .height(32.dp)
+            .fillMaxWidth()
+            .background(colorResource(id = R.color.logo_color)))
         Image(
             painter = painterResource(id = R.drawable.together),
             contentDescription = null,
@@ -67,35 +72,54 @@ fun Home(modifier: Modifier = Modifier) {
             value = "",
             onValueChange = {},
             label = {Text(text = "Look up a station")},
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(16.dp, 32.dp)
         )
 
-        StationList(stationList = Datasource().loadStations())
+        val headerModifier: Modifier = Modifier
+            .background(colorResource(id = R.color.background_color))
+            .height(44.dp)
+            .fillMaxWidth()
+            .wrapContentSize()
 
-        NewsList(newsList = Datasource().loadNews())
+        StationList(
+            stationList = Datasource().loadStations(),
+            modifier = Modifier
+                .padding(end = 32.dp, start = 32.dp, bottom = 32.dp)
+                .border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
+                .height(269.dp),
+            headerModifier = headerModifier
+        )
+        NewsList(
+            newsList = Datasource().loadNews(),
+            modifier = Modifier
+                .padding(32.dp, 0.dp)
+                .border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
+                .height(265.dp),
+            headerModifier = headerModifier
+            )
+
+        Text(text = "D-PBL - Group C - 2024", modifier = Modifier.padding(top = 40.dp, bottom = 20.dp))
     }
 
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun StationList(stationList: List<Station>, modifier: Modifier = Modifier) {
-    val numberOfStations: Int = stationList.size
-    val lazyColumnHeight: Int = (numberOfStations+1) * (60+8)
+fun StationList(stationList: List<Station>, modifier: Modifier = Modifier, headerModifier: Modifier = Modifier) {
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(32.dp, 32.dp)
-            .border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
-            .height(lazyColumnHeight.dp)
+        verticalArrangement = Arrangement.Top,
+        modifier = modifier
     ) {
 
         stickyHeader {
             Text(
                 text = "Recent & Favorites",
                 fontSize = 20.sp,
-                modifier = Modifier
-                    .padding(top=8.dp)
+                fontFamily = FontFamily(Font(R.font.shadows_into_light_two)),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                modifier = headerModifier
             )
         }
 
@@ -103,34 +127,33 @@ fun StationList(stationList: List<Station>, modifier: Modifier = Modifier) {
             StationCard(
                 station = station,
                 modifier = Modifier
-                    .padding(16.dp, 8.dp)
+                    .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
                     .height(60.dp)
             )
+        }
+
+        item {
+            Spacer(modifier = Modifier.padding(8.dp))
         }
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NewsList(newsList: List<News>, modifier: Modifier = Modifier) {
-
-    val numberOfNews: Int = newsList.size
-    val lazyColumnHeight: Int = (newsList.size) * (96+8+8) + 25 + 8 + 8
+fun NewsList(newsList: List<News>, modifier: Modifier = Modifier, headerModifier: Modifier = Modifier) {
 
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(32.dp, 0.dp)
-            .border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
-            .height(lazyColumnHeight.dp)
+        modifier = modifier
     ) {
         stickyHeader {
             Text(
                 text = "News & Announcements",
                 fontSize = 20.sp,
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .height(25.dp)
+                fontFamily = FontFamily(Font(R.font.shadows_into_light_two)),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                modifier = headerModifier
             )
         }
 
@@ -138,7 +161,7 @@ fun NewsList(newsList: List<News>, modifier: Modifier = Modifier) {
             NewsCard(
                 news = news,
                 modifier = Modifier
-                    .padding(16.dp,8.dp)
+                    .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
                     .height(96.dp)
             )
         }
@@ -190,18 +213,19 @@ fun NewsCard(news: News, modifier: Modifier = Modifier) {
                 .weight(3f)) {
                 Text(
                     text = LocalContext.current.getString(news.stringResourceId),
-                    textAlign = TextAlign.Center,
+                    textAlign = TextAlign.Start,
                     fontSize = 16.sp,
                     lineHeight = 20.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .weight(3f)
-                        .fillMaxHeight(),
+                        .fillMaxHeight()
+                        .padding(12.dp, 4.dp),
                     style = MaterialTheme.typography.headlineSmall
                 )
 
-                Text(
+                /*Text(
                     text = LocalContext.current.getString(R.string.fake),
                     textAlign = TextAlign.Justify,
                     fontSize = 12.sp,
@@ -213,7 +237,7 @@ fun NewsCard(news: News, modifier: Modifier = Modifier) {
                         .padding(8.dp, 0.dp)
                         .fillMaxHeight(),
                     style = MaterialTheme.typography.headlineSmall
-                )
+                )*/
             }
 
         }
