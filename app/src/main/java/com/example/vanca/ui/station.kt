@@ -2,6 +2,7 @@ package com.example.vanca.ui
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,18 +36,21 @@ import java.io.Console
 private val TAG: String = "Station"
 
 @Composable
-fun Station(modifier: Modifier = Modifier) {
+fun Station(
+    onTeamLinkClicked: () -> Unit,
+    stationId: Int,
+    modifier: Modifier = Modifier,
+    scrollState: ScrollState = rememberScrollState()
+) {
+
+    val station: Station = Datasource().loadStations()[stationId-1]
+
     Column (
-        modifier = modifier.verticalScroll(rememberScrollState()),
+        modifier = modifier.verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.together),
-            contentDescription = null,
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier
-                .fillMaxWidth()
-        )
+
+        AppLogo()
 
         OutlinedTextField(
             value = "",
@@ -55,7 +59,9 @@ fun Station(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(top = 16.dp)
         )
 
-        StationPage(station = Station(R.string.station1, R.drawable.station1), modifier = Modifier.padding(24.dp))
+        StationPage(station = station, modifier = Modifier.padding(24.dp))
+
+        AboutLink(onTeamLinkClicked = onTeamLinkClicked)
     }
 }
 
@@ -69,7 +75,7 @@ fun StationPage(station: Station, modifier: Modifier = Modifier) {
         )
 
         Text(
-            text = "Sao Bento",
+            text = stringResource(id = station.stringResourceId),
             textAlign = TextAlign.Center,
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
@@ -99,16 +105,16 @@ fun StationPage(station: Station, modifier: Modifier = Modifier) {
     }
 }
 
-@Preview
+/*@Preview
 @Composable
 fun StationPagePreview() {
     StationPage(station = Station(R.string.station1, R.drawable.station1),modifier = Modifier.fillMaxSize())
-}
+}*/
 
-@Preview
+/*@Preview
 @Composable
 fun StationPreview() {
     VancaTheme {
         Station(modifier = Modifier.fillMaxSize())
     }
-}
+}*/
