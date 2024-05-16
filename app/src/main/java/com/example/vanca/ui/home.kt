@@ -1,10 +1,12 @@
 package com.example.vanca.ui
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +22,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -43,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.example.vanca.R
 import com.example.vanca.data.Datasource
 import com.example.vanca.model.News
@@ -51,22 +55,19 @@ import com.example.vanca.ui.theme.VancaTheme
 
 private val TAG: String = "Home"
 @Composable
-fun Home(modifier: Modifier = Modifier, scrollState: ScrollState = rememberScrollState()) {
+fun Home(
+    modifier: Modifier = Modifier,
+    scrollState: ScrollState = rememberScrollState(),
+    onStationClicked: (Int) -> Unit,
+    onTeamLinkClicked: () -> Unit
+    ) {
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
         modifier = modifier.verticalScroll(scrollState)
     ) {
-        Spacer(modifier = Modifier
-            .height(32.dp)
-            .fillMaxWidth()
-            .background(colorResource(id = R.color.logo_color)))
-        Image(
-            painter = painterResource(id = R.drawable.together),
-            contentDescription = null,
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier.fillMaxWidth()
-        )
+        
+        AppLogo()
 
         OutlinedTextField(
             value = "",
@@ -84,28 +85,29 @@ fun Home(modifier: Modifier = Modifier, scrollState: ScrollState = rememberScrol
         StationList(
             stationList = Datasource().loadStations(),
             modifier = Modifier
-                .padding(end = 32.dp, start = 32.dp, bottom = 32.dp)
+                .padding(end = 32.dp, start = 32.dp, bottom = 32.dp, top = 32.dp)
                 .border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
                 .height(269.dp),
-            headerModifier = headerModifier
+            headerModifier = headerModifier,
+            onStationClicked = onStationClicked
         )
         NewsList(
             newsList = Datasource().loadNews(),
             modifier = Modifier
-                .padding(32.dp, 0.dp)
+                .padding(32.dp, 32.dp)
                 .border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
                 .height(265.dp),
             headerModifier = headerModifier
             )
 
-        Text(text = "D-PBL - Group C - 2024", modifier = Modifier.padding(top = 40.dp, bottom = 20.dp))
+        AboutLink(onTeamLinkClicked = onTeamLinkClicked)
     }
 
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun StationList(stationList: List<Station>, modifier: Modifier = Modifier, headerModifier: Modifier = Modifier) {
+fun StationList(stationList: List<Station>, onStationClicked: (Int) -> Unit, modifier: Modifier = Modifier, headerModifier: Modifier = Modifier) {
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
@@ -129,6 +131,7 @@ fun StationList(stationList: List<Station>, modifier: Modifier = Modifier, heade
                 modifier = Modifier
                     .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
                     .height(60.dp)
+                    .clickable { onStationClicked(station.id) }
             )
         }
 
@@ -225,26 +228,24 @@ fun NewsCard(news: News, modifier: Modifier = Modifier) {
                     style = MaterialTheme.typography.headlineSmall
                 )
 
-                /*Text(
-                    text = LocalContext.current.getString(R.string.fake),
-                    textAlign = TextAlign.Justify,
-                    fontSize = 12.sp,
-                    lineHeight = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .weight(3f)
-                        .padding(8.dp, 0.dp)
-                        .fillMaxHeight(),
-                    style = MaterialTheme.typography.headlineSmall
-                )*/
             }
 
         }
     }
 }
 
-//@Preview
+@Preview
+@Composable
+private fun HomePreview() {
+    Home(modifier = Modifier
+        .fillMaxSize()
+        .background(colorResource(id = R.color.background_color)),
+        onStationClicked = {},
+        onTeamLinkClicked = {}
+    )
+}
+
+/*@Preview
 @Composable
 private fun StationCardPreview() {
     StationCard(
@@ -252,7 +253,7 @@ private fun StationCardPreview() {
         modifier = Modifier
             .height(60.dp)
     )
-}
+}*/
 
 //@Preview
 @Composable
@@ -262,12 +263,4 @@ private fun NewsCardPreview() {
         modifier = Modifier
             .height(96.dp)
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun VancaPreview() {
-    VancaTheme {
-        Home(modifier = Modifier.fillMaxSize())
-    }
 }
