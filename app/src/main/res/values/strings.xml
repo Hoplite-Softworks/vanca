@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">vanca</string>
-    <string name="station1">Sao Bento\nAccessibility rating: 4/5</string>
-    <string name="station2">Campanha\nAccessibility rating: 1/5</string>
-    <string name="station3">Vila Nova de Gaia\nAccessibility rating: 3/5</string>
+    <string name="station1">Sao Bento</string>
+    <string name="station2">Campanha</string>
+    <string name="station3">Vila Nova de Gaia</string>
     <string name="fake">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
     <string name="news1">Sao Bento:\nElevator out of service</string>
     <string name="news2">Campanha:\nSignificant delays of departures</string>

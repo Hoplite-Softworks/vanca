@@ -1,6 +1,5 @@
 package com.example.vanca.ui
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -22,15 +21,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarData
-import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,21 +43,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.vanca.R
-import com.example.vanca.data.Datasource
 import com.example.vanca.model.News
 import com.example.vanca.model.Station
-import com.example.vanca.ui.theme.VancaTheme
 
-private val TAG: String = "Home"
 @Composable
 fun Home(
+    viewModel: AppViewModel,
+    onStationClicked: (Int) -> Unit,
+    onNewsClicked: (Int) -> Unit,
+    onTeamLinkClicked: () -> Unit,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
-    onStationClicked: (Int) -> Unit,
-    onTeamLinkClicked: () -> Unit
     ) {
+
+    val appUiState by viewModel.appUiState.collectAsState()
+
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
@@ -82,8 +81,9 @@ fun Home(
             .fillMaxWidth()
             .wrapContentSize()
 
+        val stationsRecentAndBookmarked: List<Station> = viewModel.loadRecentStations(appUiState.currentUserId).union(viewModel.loadBookmarkedStations(appUiState.currentUserId)).toList()
         StationList(
-            stationList = Datasource().loadStations(),
+            stationList = stationsRecentAndBookmarked,
             modifier = Modifier
                 .padding(end = 32.dp, start = 32.dp, bottom = 32.dp, top = 32.dp)
                 .border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
@@ -92,12 +92,13 @@ fun Home(
             onStationClicked = onStationClicked
         )
         NewsList(
-            newsList = Datasource().loadNews(),
+            newsList = viewModel.loadNews(),
             modifier = Modifier
                 .padding(32.dp, 32.dp)
                 .border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
                 .height(265.dp),
-            headerModifier = headerModifier
+            headerModifier = headerModifier,
+            onNewsClicked = onNewsClicked
             )
 
         AboutLink(onTeamLinkClicked = onTeamLinkClicked)
@@ -143,7 +144,7 @@ fun StationList(stationList: List<Station>, onStationClicked: (Int) -> Unit, mod
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NewsList(newsList: List<News>, modifier: Modifier = Modifier, headerModifier: Modifier = Modifier) {
+fun NewsList(onNewsClicked: (Int) -> Unit, newsList: List<News>, modifier: Modifier = Modifier, headerModifier: Modifier = Modifier) {
 
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -166,6 +167,7 @@ fun NewsList(newsList: List<News>, modifier: Modifier = Modifier, headerModifier
                 modifier = Modifier
                     .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
                     .height(96.dp)
+                    .clickable { onNewsClicked(news.id) }
             )
         }
     }
@@ -206,7 +208,7 @@ fun NewsCard(news: News, modifier: Modifier = Modifier) {
         Row(modifier = Modifier.fillMaxSize()) {
             Image(
                 painter = painterResource(id = news.imageResourceId),
-                contentDescription = stringResource(id = news.stringResourceId),
+                contentDescription = news.title,
                 modifier = Modifier
                     .weight(2f),
                 contentScale = ContentScale.Crop
@@ -215,7 +217,7 @@ fun NewsCard(news: News, modifier: Modifier = Modifier) {
             Column(modifier = Modifier
                 .weight(3f)) {
                 Text(
-                    text = LocalContext.current.getString(news.stringResourceId),
+                    text = news.title,
                     textAlign = TextAlign.Start,
                     fontSize = 16.sp,
                     lineHeight = 20.sp,
@@ -237,30 +239,13 @@ fun NewsCard(news: News, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun HomePreview() {
-    Home(modifier = Modifier
+    Home(
+        viewModel = viewModel(),
+        modifier = Modifier
         .fillMaxSize()
         .background(colorResource(id = R.color.background_color)),
         onStationClicked = {},
-        onTeamLinkClicked = {}
-    )
-}
-
-/*@Preview
-@Composable
-private fun StationCardPreview() {
-    StationCard(
-        Station(R.string.station1, R.drawable.station1),
-        modifier = Modifier
-            .height(60.dp)
-    )
-}*/
-
-//@Preview
-@Composable
-private fun NewsCardPreview() {
-    NewsCard(
-        News(R.string.news1, R.drawable.news1),
-        modifier = Modifier
-            .height(96.dp)
+        onTeamLinkClicked = {},
+        onNewsClicked = {}
     )
 }
