@@ -1,24 +1,19 @@
 package com.example.vanca.ui
 
-import android.util.Log
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -26,28 +21,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.vanca.R
-import com.example.vanca.data.Datasource
 import com.example.vanca.model.Station
-import com.example.vanca.ui.theme.VancaTheme
-import org.jetbrains.annotations.Debug
-import java.io.Console
 
-private val TAG: String = "Station"
 
 @Composable
 fun Station(
+    viewModel: AppViewModel,
     onTeamLinkClicked: () -> Unit,
     stationId: Int,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState()
 ) {
 
-    val station: Station = Datasource().loadStations()[stationId-1]
+    val station: Station = viewModel.loadAllStations()[stationId - 1]
 
-    Column (
+    Column(
         modifier = modifier.verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
     ) {
 
         AppLogo()
@@ -67,8 +58,10 @@ fun Station(
 
 @Composable
 fun StationPage(station: Station, modifier: Modifier = Modifier) {
-    Column(modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
+    ) {
         Image(
             painter = painterResource(id = station.imageResourceId),
             contentDescription = stringResource(id = station.stringResourceId)
@@ -91,7 +84,7 @@ fun StationPage(station: Station, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(0.dp, 24.dp)
-                //.border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
+            //.border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
         )
 
         Text(
@@ -100,21 +93,18 @@ fun StationPage(station: Station, modifier: Modifier = Modifier) {
             fontSize = 16.sp,
             modifier = Modifier
                 .fillMaxWidth()
-                //.border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
+            //.border(4.dp, Color(0xff99aaff), RoundedCornerShape(16.dp))
         )
     }
 }
 
-/*@Preview
-@Composable
-fun StationPagePreview() {
-    StationPage(station = Station(R.string.station1, R.drawable.station1),modifier = Modifier.fillMaxSize())
-}*/
-
-/*@Preview
+@Preview
 @Composable
 fun StationPreview() {
-    VancaTheme {
-        Station(modifier = Modifier.fillMaxSize())
-    }
-}*/
+    Station(
+        viewModel = AppViewModel(),
+        onTeamLinkClicked = {},
+        stationId = 1,
+        modifier = Modifier
+    )
+}
