@@ -8,5 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="background_color">#FFFFFFF0</color>
-    <color name="logo_color">#FF009FE2</color>
+    <color name="logo_color">#FF00a2e8</color>
+    <color name="logo_color2">#FFd8d2c7</color>
+    <color name="textColor">#FF222244</color>
+    <color name="cardBackgroundColor">#ffceefff</color>
+    <color name="borderColor">@color/logo_color</color>
+
 </resources>
