@@ -1,11 +1,14 @@
 package com.example.vanca.model
 
 import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
+import java.time.LocalDate
 
 data class News(
     val id: Int,
     val title: String,
     val description: String,
-    @DrawableRes val imageResourceId: Int
+    val date: LocalDate,
+    val relatedStationId: Int = 0,
+    val relatedStationName: String = "-",
+    @DrawableRes val imageResourceId: Int,
 )

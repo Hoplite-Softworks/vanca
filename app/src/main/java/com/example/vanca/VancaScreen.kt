@@ -1,5 +1,7 @@
 package com.example.vanca
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -17,10 +19,12 @@ import com.example.vanca.ui.AppViewModel
 import com.example.vanca.ui.Home
 import com.example.vanca.ui.LoginScreen
 import com.example.vanca.ui.News
+import com.example.vanca.ui.Search
 import com.example.vanca.ui.Station
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun VancaApp(){
+fun VancaApp() {
     val navController = rememberNavController()
     val viewModel: AppViewModel = viewModel()
     NavHost(navController = navController, startDestination = "login") {
@@ -34,8 +38,9 @@ fun VancaApp(){
                 viewModel = viewModel,
                 onSuccessfulLogin = {
                     navController.navigate("home") {
-                        popUpTo("login", popUpToBuilder = {inclusive = true})
-                    } },
+                        popUpTo("login", popUpToBuilder = { inclusive = true })
+                    }
+                },
                 onTeamLinkClicked = { navController.navigate("about") }
             )
         }
@@ -48,13 +53,27 @@ fun VancaApp(){
                     .background(colorResource(id = R.color.background_color)),
                 onStationClicked = { navController.navigate("station/$it") },
                 onTeamLinkClicked = { navController.navigate("about") },
-                onNewsClicked = { navController.navigate("news/$it") }
+                onNewsClicked = { navController.navigate("news/$it") },
+                onSearched = {navController.navigate("search/$it")}
+            )
+        }
+
+        composable("search/{query}") { entry ->
+            Search(
+                viewModel = viewModel,
+                stationQuery = entry.arguments?.getString("query") ?: "",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(colorResource(id = R.color.background_color)),
+                onTeamLinkClicked = { navController.navigate("about") },
+                onStationClicked = { navController.navigate("station/$it") },
+                onSearched = {navController.navigate("search/$it")}
             )
         }
 
         composable(
             "station/{id}",
-            arguments = listOf(navArgument("id") {type = NavType.IntType})
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) {
             Station(
                 viewModel = viewModel,
@@ -62,13 +81,14 @@ fun VancaApp(){
                 modifier = Modifier
                     .fillMaxSize()
                     .background(colorResource(id = R.color.background_color)),
-                onTeamLinkClicked = { navController.navigate("about") }
+                onTeamLinkClicked = { navController.navigate("about") },
+                onNoStationFound = { navController.navigate("home") }
             )
         }
 
         composable(
             "news/{id}",
-            arguments = listOf(navArgument("id") {type = NavType.IntType})
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) {
             News(
                 viewModel = viewModel,
@@ -81,7 +101,9 @@ fun VancaApp(){
         }
 
         composable("about") {
-            About()
+            About(viewModel = viewModel, modifier = Modifier.fillMaxSize()
+                .background(colorResource(id = R.color.background_color)),)
         }
     }
 }
+

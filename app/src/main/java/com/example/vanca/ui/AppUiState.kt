@@ -9,8 +9,9 @@ enum class AppScreen {
     News,
     About,
 }
+
 data class AppUiState(
     //val currentScreen: AppScreen = AppScreen.Home,
     //val currentStation: Station? = null,
-    val currentUserId: Int = 0,
+    val currentUserId: Int = 1,
 )
