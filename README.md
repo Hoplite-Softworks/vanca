@@ -1,7 +1,9 @@
 # vança app for d-pbl-C
 
-Test login
+Public Transport Accessibility App for Porto Commuters
 
+ΜΑΘΗΜΑ ΤΕΧΝΟΛΟΓΙΑΣ ΛΟΓΙΣΜΙΚΟΥ / SOFTWARE ENGINEERING COURSE @ ECE UPATRAS 2023-2024
+
+Test login:
 username: test
-
 password: test1234
